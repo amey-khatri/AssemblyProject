@@ -50,6 +50,74 @@ DIRECTIONS:
 GRAVITY_COUNTER:  .word 0      # increments every frame
 GRAVITY_RATE:     .word 37     # move down every 37 frames (~600ms at 60fps)
 
+# 5x5 pixel art bitmasks for G, A, M, E, O, V, R (Reuse E)
+# Each letter is 5 rows of 5 bits, stored as 5 words
+# 1 = draw white pixel, 0 = skip (black)
+# Letters are 5 wide x 5 tall, with 1 unit gap between them
+
+LETTER_G:
+    .word 0b11111   # █████
+    .word 0b10000   # █
+    .word 0b10111   # █ ███
+    .word 0b10001   # █   █
+    .word 0b11111   # █████
+
+LETTER_A:
+    .word 0b11111   # █████
+    .word 0b10001   # █   █
+    .word 0b11111   # █████
+    .word 0b10001   # █   █
+    .word 0b10001   # █   █
+
+LETTER_M:
+    .word 0b10001   # █   █
+    .word 0b11111   # █████
+    .word 0b10101   # █ █ █
+    .word 0b10001   # █   █
+    .word 0b10001   # █   █
+
+LETTER_E:
+    .word 0b11111   # █████
+    .word 0b10000   # █
+    .word 0b11110   # ████
+    .word 0b10000   # █
+    .word 0b11111   # █████
+
+LETTER_O:
+    .word 0b11111   # █████
+    .word 0b10001   # █   █
+    .word 0b10001   # █   █
+    .word 0b10001   # █   █
+    .word 0b11111   # █████
+
+LETTER_V:
+    .word 0b10001   # █   █
+    .word 0b10001   # █   █
+    .word 0b10001   # █   █
+    .word 0b01010   # █ █ 
+    .word 0b00100   #   █
+
+LETTER_R:
+    .word 0b11110   # ████
+    .word 0b10001   # █   █
+    .word 0b11110   # ████
+    .word 0b10010   # █  █
+    .word 0b10001   # █   █
+
+# Lookup table: pointers to each letter's bitmask
+# "GAME OVER" = G, A, M, E, O, V, E, R
+GAMEOVER_LETTERS:
+    .word LETTER_G
+    .word LETTER_A
+    .word LETTER_M
+    .word LETTER_E
+    .word LETTER_O
+    .word LETTER_V
+    .word LETTER_E
+    .word LETTER_R
+
+GAMEOVER_LEN: .word 8          # number of letters
+
 ##############################################################################
 # Mutable Data
 ##############################################################################
@@ -115,6 +183,235 @@ game_loop:
     syscall
 
     j game_loop                 # repeat forever
+    
+    
+##############################################################################
+# game_over_screen
+# Draws game over message, waits for r (retry) or q (quit)
+# Clobbers: $t0-$t2 (saves/restores $ra)
+
+game_over_screen:
+    addi $sp, $sp, -4
+    sw $ra, 0($sp)
+
+    jal draw_game_over          # draw "GAME OVER" on screen
+
+gos_wait_loop:
+    # Poll keyboard
+    lw $t0, ADDR_KBRD           # keyboard base address
+    lw $t1, 0($t0)              # 1 if key pressed
+    bne $t1, 1, gos_wait_loop   # no key, keep waiting
+
+    lw $t2, 4($t0)              # ASCII of key pressed
+    beq $t2, 0x72, gos_retry    # 'r' = retry
+    beq $t2, 0x71, gos_quit     # 'q' = quit
+    j gos_wait_loop             # any other key, keep waiting
+
+gos_retry:
+    jal reset_game              # clear all state
+    li $a0, 1                   # redraw border
+    li $a1, 2
+    jal draw_grid
+    jal generate_column         # spawn first column
+    jal draw_column
+
+    lw $ra, 0($sp)
+    addi $sp, $sp, 4
+    jr $ra                      # return to game_loop
+
+gos_quit:
+    li $v0, 10                  # exit
+    syscall    
+    
+##############################################################################
+# reset_game
+# Clears all mutable state back to initial values
+# Clobbers: $t0-$t2
+
+reset_game:
+        # --- Paint entire 256x256 bitmap black ---
+    lw $t0, ADDR_DSPL           # base address of display
+    li $t1, 4096                # 32*32 = 1024 units, * 4 bytes = 4096 words
+    li $t2, 0                   # black
+
+rgo_clear_loop:
+    beq $t1, 0, rgo_clear_done  # all units painted
+    sw $t2, 0($t0)              # paint this unit black
+    addi $t0, $t0, 4            # next unit
+    addi $t1, $t1, -1           # decrement counter
+    j rgo_clear_loop
+
+rgo_clear_done:
+
+    # Reset falling column position
+    li $t0, 2
+    sw $t0, COL_X               # center column
+    sw $zero, COL_Y             # top row
+    sw $zero, COL_GEM0
+    sw $zero, COL_GEM1
+    sw $zero, COL_GEM2
+
+    # Reset gravity counter
+    sw $zero, GRAVITY_COUNTER
+
+    # Clear GRID array (90 cells)
+    la $t0, GRID
+    li $t1, 90                  # 90 cells
+reset_grid_loop:
+    beq $t1, 0, reset_grid_done
+    sw $zero, 0($t0)            # zero this cell
+    addi $t0, $t0, 4            # next cell
+    addi $t1, $t1, -1
+    j reset_grid_loop
+reset_grid_done:
+
+    # Clear MATCH array (90 cells)
+    la $t0, MATCH
+    li $t1, 90
+reset_match_loop:
+    beq $t1, 0, reset_match_done
+    sw $zero, 0($t0)
+    addi $t0, $t0, 4
+    addi $t1, $t1, -1
+    j reset_match_loop
+reset_match_done:
+
+    jr $ra    
+    
+##############################################################################
+# draw_game_over
+# Clears the play area and draws "GAME OVER" in pixel art
+# Letters are drawn starting from bitmap row 8, centered in the play area
+# Clobbers: $t0-$t9, $s0-$s3 (saves/restores $ra, $s registers)
+
+draw_game_over:
+    addi $sp, $sp, -20
+    sw $ra, 0($sp)
+    sw $s0, 4($sp)              # letter index
+    sw $s1, 8($sp)              # current draw x (bitmap units)
+    sw $s2, 12($sp)             # current letter address
+    sw $s3, 16($sp)             # current row within letter
+
+    # --- Paint entire 256x256 bitmap black ---
+    lw $t0, ADDR_DSPL           # base address of display
+    li $t1, 4096                # 32*32 = 1024 units, * 4 bytes = 4096 words
+    li $t2, 0                   # black
+
+dgo_clear_loop:
+    beq $t1, 0, dgo_clear_done  # all units painted
+    sw $t2, 0($t0)              # paint this unit black
+    addi $t0, $t0, 4            # next unit
+    addi $t1, $t1, -1           # decrement counter
+    j dgo_clear_loop
+
+dgo_clear_done:
+
+
+    # --- Draw each letter ---
+    # "GAME OVER" is 8 letters * 6 units wide (5 + 1 gap) = 48 units
+    # Play area is 6 units wide — we draw 2 rows of 4 letters
+    # Row 1 "GAME" starts at grid row 3, col 0
+    # Row 2 "OVER" starts at grid row 10, col 0
+
+    li $s0, 0                   # letter index (0-7)
+
+dgo_letter_loop:
+    lw $t0, GAMEOVER_LEN
+    beq $s0, $t0, dgo_done      # all letters drawn
+
+    # Decide which row and col to draw at
+    # Letters 0-3 (GAME): bitmap row = GRID_ORIGIN_Y + 3, col shifts by 6 per letter
+    # Letters 4-7 (OVER): bitmap row = GRID_ORIGIN_Y + 10, col shifts by 6 per letter
+
+    li $t1, 4
+    bge $s0, $t1, dgo_second_row
+
+    # First row: GAME
+    move $t2, $s0               # letter index 0-3
+    li $t3, 6
+    mul $s1, $t2, $t3           # x = letter_index * 6 (in grid coords)
+    li $s3, 3                   # start at grid row 3
+    j dgo_draw_letter
+
+dgo_second_row:
+    # Second row: OVER
+    addi $t2, $s0, -4           # letter index 0-3 within OVER
+    li $t3, 6
+    mul $s1, $t2, $t3           # x = letter_index * 6
+    li $s3, 10                  # start at grid row 10
+
+dgo_draw_letter:
+    # Load pointer to this letter's bitmask
+    la $t0, GAMEOVER_LETTERS
+    sll $t1, $s0, 2             # letter index * 4
+    add $t0, $t0, $t1
+    lw $s2, 0($t0)              # $s2 = address of letter bitmask
+
+    # Draw 5 rows of this letter
+    li $t6, 0                   # row within letter (0-4)
+
+dgo_row_loop:
+    li $t7, 5
+    beq $t6, $t7, dgo_letter_done  # 5 rows drawn
+
+    # Load bitmask row
+    sll $t0, $t6, 2             # row * 4
+    add $t0, $t0, $s2           # address of this row's bitmask
+    lw $t1, 0($t0)              # $t1 = 5-bit bitmask
+
+    # Draw 5 pixels of this row
+    li $t2, 4                   # bit position (start from bit 4 = leftmost)
+
+dgo_pixel_loop:
+    bltz $t2, dgo_next_row      # all 5 bits drawn
+
+    # Check if this bit is set
+    srlv $t3, $t1, $t2          # shift right by bit position
+    andi $t3, $t3, 1            # isolate bit
+    beq $t3, 0, dgo_skip_pixel  # bit = 0, skip
+
+    # Compute grid col and row for this pixel
+    li $t4, 4
+    sub $t4, $t4, $t2           # pixel col within letter = 4 - bit_pos
+    add $t4, $t4, $s1           # + letter x offset = grid col
+    add $t5, $s3, $t6           # grid row = letter_start_row + row_within_letter
+
+    # Save $t1 (bitmask) and $t2 (bit position) before jal clobbers them
+    addi $sp, $sp, -8
+    sw $t1, 0($sp)              # save bitmask row
+    sw $t2, 4($sp)              # save bit position
+
+    move $a0, $t4               # grid col
+    move $a1, $t5               # grid row
+    jal grid_to_addr            # $v0 = bitmap address — clobbers $t0-$t3
+
+    lw $t1, 0($sp)              # restore bitmask row
+    lw $t2, 4($sp)              # restore bit position
+    addi $sp, $sp, 8
+
+    lw $t3, WHITE               # reload WHITE — $t3 was clobbered
+    sw $t3, 0($v0)              # paint white
+
+dgo_skip_pixel:
+    addi $t2, $t2, -1           # next bit
+    j dgo_pixel_loop
+
+dgo_next_row:
+    addi $t6, $t6, 1            # next row within letter
+    j dgo_row_loop
+
+dgo_letter_done:
+    addi $s0, $s0, 1            # next letter
+    j dgo_letter_loop
+
+dgo_done:
+    lw $ra, 0($sp)
+    lw $s0, 4($sp)
+    lw $s1, 8($sp)
+    lw $s2, 12($sp)
+    lw $s3, 16($sp)
+    addi $sp, $sp, 20
+    jr $ra    
     
 ##############################################################################
 # apply_column_gravity
@@ -766,8 +1063,12 @@ match_loop_done:
     jr $ra
 
 game_over:
-    li $v0, 10                  # syscall 10 = exit
-    syscall                     # terminate program
+    addi $sp, $sp, -4           # need stack since we jal
+    sw $ra, 0($sp)
+    jal game_over_screen        # show screen, wait for r/q
+    addi $sp, $sp, 4
+    lw $ra, 0($sp)
+    jr $ra                      # if retry, return up to game_loop
 
 ##############################################################################
 # check_keyboard
