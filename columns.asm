@@ -103,7 +103,7 @@ LETTER_R:
     .word 0b11110   # ████
     .word 0b10010   # █  █
     .word 0b10001   # █   █
-
+    
 # Lookup table: pointers to each letter's bitmask
 # "GAME OVER" = G, A, M, E, O, V, E, R
 GAMEOVER_LETTERS:
@@ -117,6 +117,76 @@ GAMEOVER_LETTERS:
     .word LETTER_R
 
 GAMEOVER_LEN: .word 8          # number of letters
+    
+LETTER_P:
+    .word 0b11110   # ████
+    .word 0b10001   # █   █
+    .word 0b11110   # ████
+    .word 0b10000   # █
+    .word 0b10000   # █
+
+LETTER_U:
+    .word 0b10001   # █   █
+    .word 0b10001   # █   █
+    .word 0b10001   # █   █
+    .word 0b10001   # █   █
+    .word 0b11111   # █████
+
+LETTER_S:
+    .word 0b11111   # █████
+    .word 0b10000   # █
+    .word 0b11111   # █████
+    .word 0b00001   #     █
+    .word 0b11111   # █████
+
+PAUSED_LETTERS:
+    .word LETTER_P
+    .word LETTER_A
+    .word LETTER_U
+    .word LETTER_S
+    .word LETTER_E
+
+PAUSED_LEN: .word 5
+
+MELODY_PITCHES:
+    .word 81, 76, 84, 76, 83, 76, 81, 76, 80, 76, 83, 76, 81, 76, 80, 76
+    .word 79, 74, 83, 74, 81, 74, 79, 74, 78, 74, 79, 74, 81, 74, 79, 74
+    .word 81, 76, 84, 76, 83, 76, 81, 76, 86, 76, 83, 76, 80, 76, 83, 76
+    .word 79, 74, 83, 74, 81, 74, 84, 74, 83, 74, 79, 74, 78, 74, 79, 81
+    .word 76, 84, 76, 83, 76, 81, 76, 80, 76, 83, 76, 81, 76, 80, 76, 81
+    .word 76, 84, 76, 83, 76, 81, 76, 80, 76, 83, 76, 86, 76, 84, 83, 79
+    .word 74, 79, 81, 83, 81, 79, 81, 78, 79, 81, 78, 74, 76, 78, 74, 81
+    .word 76, 84, 76, 83, 76, 81, 76, 80, 76, 83, 76, 81, 76, 80, 76, 79
+    .word 74, 83, 74, 81, 74, 79, 74, 78, 74, 79, 74, 81, 74, 79, 74, 81
+    .word 76, 84, 76, 83, 76, 81, 76, 86, 76, 83, 76, 80, 76, 83, 76, 79
+    .word 74, 83, 74, 81, 74, 84, 74, 83, 74, 79, 74, 78, 74, 79, 81, 76
+    .word 84, 76, 83, 76, 81, 76, 80, 76, 83, 76, 81, 76, 80, 76, 81, 76
+    .word 84, 76, 83, 76, 81, 76, 80, 76, 83, 76, 86, 76, 84, 83, 79, 74
+    .word 79, 81, 83, 81, 79, 81, 78, 79, 81, 78, 74, 76, 78, 74, 45, 40
+    .word 45, 48, 47, 44, 40, 44, 43, 47, 50, 43, 42, 43, 45, 42, 45, 40
+    .word 45, 48, 47, 44, 40, 44, 43, 47, 50, 43, 42, 43, 45, 42, 45, 40
+
+MELODY_DURATIONS:
+    .word 12, 12, 13, 12, 12, 13, 12, 12, 12, 12, 13, 13, 12, 13, 12, 13
+    .word 13, 12, 13, 12, 13, 13, 13, 13, 12, 13, 13, 13, 13, 12, 13, 13
+    .word 13, 13, 12, 13, 13, 13, 13, 12, 13, 12, 12, 13, 12, 13, 12, 13
+    .word 12, 12, 13, 12, 13, 12, 12, 13, 12, 13, 12, 12, 13, 12, 25, 12
+    .word 13, 12, 13, 12, 12, 13, 12, 13, 12, 12, 13, 12, 13, 12, 12, 12
+    .word 12, 12, 12, 13, 12, 12, 12, 12, 13, 12, 12, 12, 12, 13, 12, 12
+    .word 12, 12, 13, 12, 12, 12, 12, 13, 12, 12, 12, 12, 13, 12, 12, 13
+    .word 12, 13, 12, 13, 13, 12, 13, 12, 13, 13, 12, 13, 12, 13, 13, 12
+    .word 13, 12, 13, 13, 12, 13, 12, 13, 13, 12, 13, 12, 13, 13, 12, 13
+    .word 12, 13, 13, 12, 13, 12, 13, 13, 12, 13, 12, 13, 13, 12, 13, 12
+    .word 13, 13, 12, 13, 12, 13, 13, 12, 13, 12, 13, 13, 12, 25, 13, 13
+    .word 13, 12, 13, 13, 13, 13, 12, 13, 13, 13, 13, 12, 13, 13, 13, 12
+    .word 13, 13, 13, 13, 12, 13, 13, 13, 13, 12, 13, 13, 13, 13, 12, 13
+    .word 13, 13, 13, 12, 13, 13, 13, 13, 12, 13, 13, 13, 13, 13, 19, 19
+    .word 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19
+    .word 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19
+
+MELODY_LEN:     .word 256
+MELODY_INDEX:   .word 0
+NOTE_COUNTER:   .word 0
 
 ##############################################################################
 # Mutable Data
@@ -148,6 +218,16 @@ COL_GEM0:   .word 0     # top gem colour ID
 COL_GEM1:   .word 0     # middle gem colour ID
 COL_GEM2:   .word 0     # bottom gem colour ID
 
+# Next column preview gems
+NEXT_GEM0:  .word 0             # top gem colour ID of next column
+NEXT_GEM1:  .word 0             # middle gem colour ID
+NEXT_GEM2:  .word 0             # bottom gem colour ID
+
+# Preview panel position in bitmap units (0-indexed, not grid coords)
+PREVIEW_X:  .word 12            # bitmap col of preview panel
+PREVIEW_Y:  .word 5             # bitmap row of top preview gem
+
+IS_PAUSED:  .word 0             # 0 = running, 1 = paused
 
 
 ##############################################################################
@@ -164,11 +244,9 @@ main:
     li $a1, 2
     jal draw_grid
 
-    jal generate_column
-    jal draw_column
-
-
-    
+    jal generate_next_column    # generate the first "next" column
+    jal spawn_next_column       # copy next → current, generate new next, draw preview
+    jal draw_column             # draw the first falling column
 
 game_loop:
     # 1. Check keyboard input
@@ -176,6 +254,8 @@ game_loop:
 
     # 2. Apply gravity
     jal apply_column_gravity    # move column down on timer, land if needed
+    
+    jal play_music
 
     # 3. Sleep
     li $v0, 32                  # syscall 32 = sleep
@@ -184,6 +264,234 @@ game_loop:
 
     j game_loop                 # repeat forever
     
+    
+    
+##############################################################################
+    
+##############################################################################
+play_music:
+    lw $t0, IS_PAUSED
+    bne $t0, 0, pm_done
+
+    # Increment note counter
+    lw $t0, NOTE_COUNTER
+    addi $t0, $t0, 1
+    sw $t0, NOTE_COUNTER
+
+    # Load duration of CURRENT note
+    lw $t1, MELODY_INDEX
+    la $t2, MELODY_DURATIONS
+    sll $t3, $t1, 2             # index * 4
+    add $t2, $t2, $t3
+    lw $t4, 0($t2)              # duration of current note in frames
+
+    blt $t0, $t4, pm_done       # not yet time for next note
+
+    # Reset counter and advance index
+    sw $zero, NOTE_COUNTER
+    addi $t1, $t1, 1
+    lw $t2, MELODY_LEN
+    blt $t1, $t2, pm_no_wrap
+    li $t1, 0
+pm_no_wrap:
+    sw $t1, MELODY_INDEX
+
+    # Load pitch for new note
+    la $t2, MELODY_PITCHES
+    sll $t3, $t1, 2
+    add $t2, $t2, $t3
+    lw $t3, 0($t2)              # pitch
+
+    beq $t3, 0, pm_done         # rest, skip
+
+    # Play note
+    li $v0, 33                  # async MIDI
+    move $a0, $t3               # pitch
+    lw $t4, MELODY_DURATIONS
+    la $t4, MELODY_DURATIONS
+    sll $t5, $t1, 2
+    add $t4, $t4, $t5
+    lw $a1, 0($t4)              # duration of this note
+    li $t5, 16
+    mul $a1, $a1, $t5           # convert frames to ms
+    li $a2, 18                  # instrument
+    li $a3, 90                  # volume
+    syscall
+
+pm_done:
+    jr $ra    
+    
+
+##############################################################################
+# handle_p — toggle pause
+# If unpaused: draw paused screen, set IS_PAUSED = 1
+# If paused:   resume game, set IS_PAUSED = 0
+
+handle_p:
+    addi $sp, $sp, -4
+    sw $ra, 0($sp)
+
+    lw $t0, IS_PAUSED           # load pause state
+    bne $t0, 0, handle_p_resume # already paused, resume
+
+    # --- Pause the game ---
+    li $t0, 1
+    sw $t0, IS_PAUSED           # set paused flag
+    jal draw_paused             # draw paused screen
+
+    lw $ra, 0($sp)
+    addi $sp, $sp, 4
+    j check_keyboard_done
+
+handle_p_resume:
+    # --- Resume the game ---
+    sw $zero, IS_PAUSED         # clear paused flag
+    
+    # --- Paint entire bitmap black ---
+    lw $t0, ADDR_DSPL
+    li $t1, 1024                # 32*32 units
+    li $t2, 0
+
+hp_clear_loop:
+    beq $t1, 0, hp_clear_done
+    sw $t2, 0($t0)
+    addi $t0, $t0, 4
+    addi $t1, $t1, -1
+    j hp_clear_loop
+hp_clear_done:
+
+    li $a0, 1
+    li $a1, 2    
+    jal draw_grid               # redraw border
+
+    # Redraw all landed gems
+    jal draw_grid_gems
+
+    # Redraw falling column
+    jal draw_column
+
+    # Redraw preview panel
+    jal draw_preview
+
+    lw $ra, 0($sp)
+    addi $sp, $sp, 4
+    j check_keyboard_done    
+
+##############################################################################
+# draw_paused
+# Clears bitmap and draws "PAUSED" in pixel art centered on screen
+# Clobbers: $t0-$t9, $s0-$s3 (saves/restores $ra, $s registers)
+
+draw_paused:
+    addi $sp, $sp, -20
+    sw $ra, 0($sp)
+    sw $s0, 4($sp)              # letter index
+    sw $s1, 8($sp)              # current draw x (bitmap units)
+    sw $s2, 12($sp)             # current letter address
+    sw $s3, 16($sp)             # start row
+
+    # --- Paint entire bitmap black ---
+    lw $t0, ADDR_DSPL
+    li $t1, 1024                # 32*32 units
+    li $t2, 0
+
+dp_clear_loop:
+    beq $t1, 0, dp_clear_done
+    sw $t2, 0($t0)
+    addi $t0, $t0, 4
+    addi $t1, $t1, -1
+    j dp_clear_loop
+dp_clear_done:
+
+    li $s0, 0                   # letter index (0-5)
+
+dp_letter_loop:
+    lw $t0, PAUSED_LEN
+    beq $s0, $t0, dp_done       # all letters drawn
+
+    # "PAUSED" fits in one row — start at bitmap col 1, row 13 (screen center)
+    move $t2, $s0               # letter index 0-5
+    li $t3, 6
+    mul $s1, $t2, $t3           # x = letter_index * 6
+    addi $s1, $s1, 1            # shift right 4 units to center 5 letters on 32-wide display
+    li $s3, 13                  # bitmap row (centered vertically)
+
+    # Load pointer to this letter's bitmask
+    la $t0, PAUSED_LETTERS
+    sll $t1, $s0, 2             # letter index * 4
+    add $t0, $t0, $t1
+    lw $s2, 0($t0)              # $s2 = address of letter bitmask
+
+    # Draw 5 rows of this letter
+    li $t6, 0                   # row within letter (0-4)
+
+dp_row_loop:
+    li $t7, 5
+    beq $t6, $t7, dp_letter_done
+
+    # Load bitmask row
+    sll $t0, $t6, 2             # row * 4
+    add $t0, $t0, $s2
+    lw $t1, 0($t0)              # $t1 = 5-bit bitmask
+
+    li $t2, 4                   # bit position (leftmost first)
+
+dp_pixel_loop:
+    bltz $t2, dp_next_row
+
+    srlv $t3, $t1, $t2          # shift right by bit pos
+    andi $t3, $t3, 1            # isolate bit
+    beq $t3, 0, dp_skip_pixel   # bit = 0, skip
+
+    # Compute bitmap address directly (not grid_to_addr — outside game grid)
+    li $t4, 4
+    sub $t4, $t4, $t2           # pixel col within letter
+    add $t4, $t4, $s1           # + letter x offset = bitmap col
+
+    add $t5, $s3, $t6           # bitmap row = start_row + row_within_letter
+
+    # Save $t1, $t2, $t6 before clobbering
+    addi $sp, $sp, -12
+    sw $t1, 0($sp)              # save bitmask
+    sw $t2, 4($sp)              # save bit position
+    sw $t6, 8($sp)              # save row within letter
+
+    # Compute address manually: base + (row*32 + col) * 4
+    lw $t0, ADDR_DSPL
+    li $t3, 32
+    mul $t3, $t5, $t3           # row * 32
+    add $t3, $t3, $t4           # + col
+    sll $t3, $t3, 2             # * 4
+    add $t3, $t0, $t3           # display_base + offset
+
+    lw $t0, WHITE
+    sw $t0, 0($t3)              # paint white pixel
+
+    lw $t1, 0($sp)              # restore bitmask
+    lw $t2, 4($sp)              # restore bit position
+    lw $t6, 8($sp)              # restore row within letter
+    addi $sp, $sp, 12
+
+dp_skip_pixel:
+    addi $t2, $t2, -1           # next bit
+    j dp_pixel_loop
+
+dp_next_row:
+    addi $t6, $t6, 1            # next row within letter
+    j dp_row_loop
+
+dp_letter_done:
+    addi $s0, $s0, 1            # next letter
+    j dp_letter_loop
+
+dp_done:
+    lw $ra, 0($sp)
+    lw $s0, 4($sp)
+    lw $s1, 8($sp)
+    lw $s2, 12($sp)
+    lw $s3, 16($sp)
+    addi $sp, $sp, 20
+    jr $ra
     
 ##############################################################################
 # game_over_screen
@@ -212,7 +520,8 @@ gos_retry:
     li $a0, 1                   # redraw border
     li $a1, 2
     jal draw_grid
-    jal generate_column         # spawn first column
+    jal generate_next_column    # fresh next column
+    jal spawn_next_column       # copy to current, draw preview
     jal draw_column
 
     lw $ra, 0($sp)
@@ -422,6 +731,10 @@ dgo_done:
 apply_column_gravity:
     addi $sp, $sp, -4           # allocate stack space
     sw $ra, 0($sp)              # save return address
+    
+    # Skip gravity entirely if paused
+    lw $t0, IS_PAUSED           # load pause flag
+    bne $t0, 0, acg_done        # paused, do nothing
 
     # Increment counter
     lw $t0, GRAVITY_COUNTER     # load current counter value
@@ -1055,8 +1368,8 @@ match_loop_done:
     jal check_game_over         # returns 1 in $v0 if spawn area occupied
     bne $v0, 0, game_over       # if game over, branch away
 
-    jal generate_column         # pick 3 new random gem colours
-    jal draw_column             # draw new column at top center
+    jal spawn_next_column       # copy next → current, generate new next, draw preview
+    jal draw_column
 
     lw $ra, 0($sp)              # restore return address
     addi $sp, $sp, 4            # free stack space
@@ -1090,6 +1403,7 @@ check_keyboard:
     beq $t2, 0x77, handle_w    # 'w' = shuffle
     beq $t2, 0x73, handle_s    # 's' = drop
     beq $t2, 0x71, handle_q    # 'q' = quit
+    beq $t2, 0x70, handle_p    # 'p' = pause/resume
 
 check_keyboard_done:
     lw $ra, 0($sp)
@@ -1361,49 +1675,185 @@ grid_to_addr:
     add $v0, $t0, $t1           # display_base + offset
     jr $ra
 
-##############################################################################
-# generate_column
-# Picks 3 random colour IDs (1-6), writes to COL_GEM0/1/2
-# Resets COL_X to center (2), COL_Y to 0
-# Clobbers: $t0, $a0, $a1, $v0 (saves/restores $ra)
 
-generate_column:
+##############################################################################
+# draw_preview
+# Draws NEXT_GEM0/1/2 at the preview panel position on the bitmap
+# Uses PREVIEW_X/Y directly (not grid_to_addr — preview is outside the grid)
+# Clobbers: $t0-$t4 (saves/restores $ra)
+
+draw_preview:
     addi $sp, $sp, -4
     sw $ra, 0($sp)
 
-    # Reset position to top-center
-    li $t0, 2
-    sw $t0, COL_X
-    sw $zero, COL_Y
+    lw $t0, ADDR_DSPL           # display base
+    lw $t1, PREVIEW_X           # preview bitmap col
+    lw $t2, PREVIEW_Y           # preview bitmap row of top gem
 
-    # Generate gem 0
-    li $v0, 42                  # syscall 42 = "random int with upper bound"
-    li $a0, 0                   # RNG generator ID 
-    li $a1, 6                   # upper bound (exclusive), so result is 0-5
-    syscall                     # after this, $a0 = random number 0-5
-    addi $a0, $a0, 1            # shift to 1-6 (dont want 0 = black)
-    sw $a0, COL_GEM0
+    # --- Draw gem 0 (top) ---
+    li $t3, 32                  # display width
+    mul $t4, $t2, $t3           # row * 32
+    add $t4, $t4, $t1           # + col
+    sll $t4, $t4, 2             # * 4 = byte offset
+    add $t4, $t0, $t4           # display_base + offset = pixel address
 
-    # Generate gem 1
-    li $v0, 42
-    li $a0, 0
-    li $a1, 6
-    syscall
-    addi $a0, $a0, 1
-    sw $a0, COL_GEM1
+    lw $a0, NEXT_GEM0           # colour ID of top preview gem
+    jal get_colour              # $v0 = RGB
+    sw $v0, 0($t4)              # paint pixel
 
-    # Generate gem 2
-    li $v0, 42
-    li $a0, 0
-    li $a1, 6
-    syscall
-    addi $a0, $a0, 1
-    sw $a0, COL_GEM2
+    # --- Draw gem 1 (middle, row + 1) ---
+    lw $t0, ADDR_DSPL           # display base
+    lw $t1, PREVIEW_X
+    lw $t2, PREVIEW_Y
+    addi $t2, $t2, 1            # row + 1
+    li $t3, 32
+    mul $t4, $t2, $t3
+    add $t4, $t4, $t1
+    sll $t4, $t4, 2
+    add $t4, $t0, $t4
+
+    lw $a0, NEXT_GEM1
+    jal get_colour
+    sw $v0, 0($t4)
+
+    # --- Draw gem 2 (bottom, row + 2) ---
+    lw $t0, ADDR_DSPL           # display base
+    lw $t1, PREVIEW_X
+    lw $t2, PREVIEW_Y
+    addi $t2, $t2, 2            # row + 2
+    li $t3, 32
+    mul $t4, $t2, $t3
+    add $t4, $t4, $t1
+    sll $t4, $t4, 2
+    add $t4, $t0, $t4
+
+    lw $a0, NEXT_GEM2
+    jal get_colour
+    sw $v0, 0($t4)
 
     lw $ra, 0($sp)
     addi $sp, $sp, 4
     jr $ra
 
+
+##############################################################################
+# erase_preview
+# Paints black over the 3 preview gem cells
+# Clobbers: $t0-$t4 (saves/restores $ra)
+
+erase_preview:
+    addi $sp, $sp, -4
+    sw $ra, 0($sp)
+
+    lw $t0, ADDR_DSPL
+    lw $t3, BLACK
+
+    # Erase gem 0
+    lw $t1, PREVIEW_X
+    lw $t2, PREVIEW_Y
+    li $t4, 32
+    mul $t2, $t2, $t4           # row * 32
+    add $t2, $t2, $t1           # + col
+    sll $t2, $t2, 2             # * 4
+    add $t2, $t0, $t2
+    sw $t3, 0($t2)              # paint black
+
+    # Erase gem 1
+    lw $t1, PREVIEW_X
+    lw $t2, PREVIEW_Y
+    addi $t2, $t2, 1            # row + 1
+    li $t4, 32
+    mul $t2, $t2, $t4
+    add $t2, $t2, $t1
+    sll $t2, $t2, 2
+    add $t2, $t0, $t2
+    sw $t3, 0($t2)
+
+    # Erase gem 2
+    lw $t1, PREVIEW_X
+    lw $t2, PREVIEW_Y
+    addi $t2, $t2, 2            # row + 2
+    li $t4, 32
+    mul $t2, $t2, $t4
+    add $t2, $t2, $t1
+    sll $t2, $t2, 2
+    add $t2, $t0, $t2
+    sw $t3, 0($t2)
+
+    lw $ra, 0($sp)
+    addi $sp, $sp, 4
+    jr $ra
+
+##############################################################################
+# generate_next_column
+# Picks 3 random colour IDs (1-6), writes to NEXT_GEM0/1/2
+# Does NOT touch COL_X, COL_Y, COL_GEM0/1/2
+# Clobbers: $a0, $v0 (saves/restores $ra)
+
+generate_next_column:
+    addi $sp, $sp, -4
+    sw $ra, 0($sp)
+
+    # Generate next gem 0
+    li $v0, 42                  # syscall 42 = random bounded int
+    li $a0, 0                   # RNG id
+    li $a1, 6                   # 0-5
+    syscall
+    addi $a0, $a0, 1            # shift to 1-6
+    sw $a0, NEXT_GEM0           # store in next preview slot
+
+    # Generate next gem 1
+    li $v0, 42
+    li $a0, 0
+    li $a1, 6
+    syscall
+    addi $a0, $a0, 1
+    sw $a0, NEXT_GEM1
+
+    # Generate next gem 2
+    li $v0, 42
+    li $a0, 0
+    li $a1, 6
+    syscall
+    addi $a0, $a0, 1
+    sw $a0, NEXT_GEM2
+
+    lw $ra, 0($sp)
+    addi $sp, $sp, 4
+    jr $ra
+
+
+##############################################################################
+# spawn_next_column
+# Copies NEXT_GEM0/1/2 into COL_GEM0/1/2, resets position to top-center
+# Then generates a new next column and draws the preview
+# Clobbers: $t0 (saves/restores $ra)
+
+spawn_next_column:
+    addi $sp, $sp, -4
+    sw $ra, 0($sp)
+
+    # Copy next → current
+    lw $t0, NEXT_GEM0
+    sw $t0, COL_GEM0            # current top gem = next top gem
+    lw $t0, NEXT_GEM1
+    sw $t0, COL_GEM1
+    lw $t0, NEXT_GEM2
+    sw $t0, COL_GEM2
+
+    # Reset position
+    li $t0, 2
+    sw $t0, COL_X               # center col
+    sw $zero, COL_Y             # top row
+
+    # Generate new next column and show preview
+    jal erase_preview           # clear old preview gems
+    jal generate_next_column    # pick new next gems
+    jal draw_preview            # draw new preview
+
+    lw $ra, 0($sp)
+    addi $sp, $sp, 4
+    jr $ra
 ##############################################################################
 # draw_column
 # Draws the 3 gems of the current falling column onto the bitmap display
